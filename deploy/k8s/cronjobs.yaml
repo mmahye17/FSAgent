@@ -1,0 +1,125 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: sync-contacts
+spec:
+  schedule: "0 2 * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: sync-contacts
+              image: fsagent:latest
+              command: ["python", "scripts/cron/sync_contacts.py"]
+              envFrom:
+                - configMapRef:
+                    name: fsagent-config
+                - secretRef:
+                    name: fsagent-secrets
+          restartPolicy: OnFailure
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: refresh-wiki-cache
+spec:
+  schedule: "0 */1 * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: refresh-wiki
+              image: fsagent:latest
+              command: ["python", "scripts/cron/refresh_wiki.py"]
+              envFrom:
+                - configMapRef:
+                    name: fsagent-config
+                - secretRef:
+                    name: fsagent-secrets
+          restartPolicy: OnFailure
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: daily-digest
+spec:
+  schedule: "0 8 * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: daily-digest
+              image: fsagent:latest
+              command: ["python", "scripts/cron/daily_digest.py"]
+              envFrom:
+                - configMapRef:
+                    name: fsagent-config
+                - secretRef:
+                    name: fsagent-secrets
+          restartPolicy: OnFailure
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: cleanup-sessions
+spec:
+  schedule: "0 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: cleanup-sessions
+              image: fsagent:latest
+              command: ["python", "scripts/cron/cleanup_sessions.py"]
+              envFrom:
+                - configMapRef:
+                    name: fsagent-config
+                - secretRef:
+                    name: fsagent-secrets
+          restartPolicy: OnFailure
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: archive-memories
+spec:
+  schedule: "0 3 * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: archive-memories
+              image: fsagent:latest
+              command: ["python", "scripts/cron/archive_memories.py"]
+              envFrom:
+                - configMapRef:
+                    name: fsagent-config
+                - secretRef:
+                    name: fsagent-secrets
+          restartPolicy: OnFailure
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: failure-learner
+spec:
+  schedule: "0 9 * * 1"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: failure-learner
+              image: fsagent:latest
+              command: ["python", "scripts/learner/run_weekly.py"]
+              envFrom:
+                - configMapRef:
+                    name: fsagent-config
+                - secretRef:
+                    name: fsagent-secrets
+          restartPolicy: OnFailure
